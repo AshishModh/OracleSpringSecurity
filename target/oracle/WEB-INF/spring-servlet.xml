@@ -1,0 +1,74 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.springframework.org/schema/security https://www.springframework.org/schema/security/spring-security.xsd">
+
+    <context:component-scan base-package="Controller"/>
+
+    <context:annotation-config/>
+
+    <bean class="Controller.HomeController" id="homeController">
+        <constructor-arg name="service" ref="UserService"></constructor-arg>
+    </bean>
+
+    <bean class="Services.UserServiceImpl" id="UserService">
+        <constructor-arg name="userDao" ref="UserDao"></constructor-arg>
+    </bean>
+
+    <bean class="Repository.UserDaoImpl" id="UserDao">
+        <constructor-arg name="template" ref="JdbcTemplate"></constructor-arg>
+    </bean>
+
+    <bean id="JdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg name="dataSource" ref="dataSource"></constructor-arg>
+    </bean>
+
+    <!-- HikariCP configuration -->
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <constructor-arg ref="hikariConfig"/>
+    </bean>
+
+
+<!--                <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+<!--                    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />-->
+<!--                    <property name="url" value="jdbc:oracle:thin:@localhost:1521/XEPDB1" />-->
+<!--                    <property name="username" value="student" />-->
+<!--                    <property name="password" value="student4898" />-->
+<!--                </bean>-->
+
+
+    <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+        <property name="poolName" value="springHikariCP"/>
+        <property name="connectionTestQuery" value="SELECT 1 FROM DUAL"/>
+        <property name="dataSourceClassName" value="oracle.jdbc.pool.OracleDataSource"/>
+
+        <property name="autoCommit" value="true"/>
+        <property name="maximumPoolSize" value="5"/>
+        <property name="connectionTimeout" value="250"/>
+        <property name="minimumIdle" value="4"/>
+        <property name="idleTimeout" value="10000"/>
+        <property name="maxLifetime" value="20000"/>
+
+
+        <property name="dataSourceProperties">
+            <props>
+                <prop key="url">jdbc:oracle:thin:@localhost:1521/XEPDB1</prop>
+                <prop key="user">student</prop>
+                <prop key="password">student4898</prop>
+            </props>
+        </property>
+    </bean>
+
+
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+
+
+</beans>
